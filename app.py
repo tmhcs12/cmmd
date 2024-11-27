@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, emit
 import subprocess
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")  # Allow connections from any origin
 
 # Route to serve the terminal HTML page
 @app.route('/')
@@ -30,6 +30,6 @@ def handle_command(command):
 
 # Main entry point to run the app
 if __name__ == "__main__":
-    # Use the port from Heroku or default to 8000
+    # Use the port from the environment or default to 8000
     port = int(os.environ.get('PORT', 8000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
