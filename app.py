@@ -32,4 +32,5 @@ def handle_command(command):
 if __name__ == "__main__":
     # Use the port from the environment or default to 8000
     port = int(os.environ.get('PORT', 8000))
+    # Run the app without specifying 'eventlet' or 'gevent'
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
