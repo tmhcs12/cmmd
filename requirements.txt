@@ -1,4 +1,4 @@
-ecdsa==0.17.0
-tqdm==4.65.0
-bitcoin==1.2.7
-base58==2.1.1
+ecdsa
+tqdm
+bitcoin
+base58
