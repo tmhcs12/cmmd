@@ -4,32 +4,35 @@ from flask_socketio import SocketIO, emit
 import subprocess
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")  # Allow connections from any origin
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Route to serve the terminal HTML page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# SocketIO event to handle commands from the client
 @socketio.on('execute_command')
 def handle_command(command):
     try:
-        # Execute the command in the shell
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(f"Executing command: {command}")  # Debugging print
+        # Run command with text=True to avoid byte-to-str conversion issues
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         stdout, stderr = process.communicate()
 
-        # Send back the output and error (if any) to the client
+        # Debug prints to log output and errors
         if stdout:
-            emit('command_output', {'output': stdout.decode('utf-8')})
+            print(f"Command output: {stdout}")
+            emit('command_output', {'output': stdout})
         if stderr:
-            emit('command_output', {'output': stderr.decode('utf-8')})
-    
+            print(f"Command error: {stderr}")
+            emit('command_output', {'output': stderr})
+        if not stdout and not stderr:
+            emit('command_output', {'output': "Command executed successfully with no output."})
+
     except Exception as e:
+        print(f"Error executing command: {str(e)}")
         emit('command_output', {'output': f"Error executing command: {str(e)}"})
 
-# Main entry point to run the app
 if __name__ == "__main__":
-    # Use the port from the environment or default to 8000
     port = int(os.environ.get('PORT', 8000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+    print("Starting server...")
+    socketio.run(app, host='127.1.1.1', port=port, debug=True)
