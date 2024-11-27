@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-Based Terminal</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #222; color: white; padding: 20px; }
+        #output { white-space: pre-wrap; font-family: monospace; background-color: black; padding: 10px; margin-bottom: 20px; }
+        input[type="text"] { width: 100%; padding: 10px; background-color: #333; color: white; border: 1px solid #555; }
+        input[type="text"]:focus { outline: none; }
+    </style>
+</head>
+<body>
+
+<h2>Web-Based Terminal</h2>
+<div id="output"></div>
+<input type="text" id="command" placeholder="Type your command here..." onkeydown="if(event.key === 'Enter') sendCommand()">
+<button onclick="checkProgress()">Check Progress OK</button>
+
+<script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    // Listen for command output from the server
+    socket.on('command_output', function(data) {
+        var outputDiv = document.getElementById('output');
+        outputDiv.textContent += data.output + '\n';
+        outputDiv.scrollTop = outputDiv.scrollHeight;  // Auto-scroll to the latest output
+    });
+
+    // Send command to the server
+    function sendCommand() {
+        var command = document.getElementById('command').value;
+        if (command.trim() !== '') {
+            socket.emit('execute_command', command);  // Send command to server
+            document.getElementById('command').value = '';  // Clear input field
+            document.getElementById('output').textContent += "$ " + command + "\n";  // Show typed command
+        }
+    }
+
+    // Function to check progress of tasks
+    function checkProgress() {
+        socket.emit('get_task_progress');
+    }
+</script>
+
+</body>
+</html>
