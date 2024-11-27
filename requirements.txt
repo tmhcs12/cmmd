@@ -1,4 +1,2 @@
-ecdsa
-tqdm
-bitcoin
-base58
+Flask
+paramiko
