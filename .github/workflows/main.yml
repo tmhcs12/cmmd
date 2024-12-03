@@ -1,0 +1,26 @@
+name: Run Workflow Script
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+          
+      - name: Install SSH Client and sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-client sshpass
+      - name: Run Python script over SSH
+        run: |
+          sshpass -p "Chomulal123" ssh -o StrictHostKeyChecking=no prize-figure-fah@sgp.domcloud.co 'cd public_html/scan && python -u sc71-73.py'
